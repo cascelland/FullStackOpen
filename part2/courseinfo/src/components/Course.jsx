@@ -23,11 +23,14 @@ const Part = ({ part }) => {
     )
 }
 
+const Total = ({ exercises }) => (<b>total of {exercises.reduce((total, amount) => total + amount)} exercises</b>)
+
 const Course = ({ course }) => {
     return (
         <div>
             <Header name={course.name} />
             <Content key={course.id} parts={course.parts} />
+            <Total exercises={course.parts.map(part => part.exercises)} />
         </div>
     )
 }

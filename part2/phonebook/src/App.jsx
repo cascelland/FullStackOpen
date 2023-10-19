@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from "axios"
+import personsService from "./services/persons"
 
 import Persons from './components/Persons'
 import Filter from './components/Filter'
@@ -14,15 +15,12 @@ const App = () => {
 
 
   useEffect(() => {
-    axios
-    .get("http://localhost:3001/persons")
-    .then(response => {
-      setPersons(response.data)
-      setFilteredPersons(response.data)
-    })
+    personsService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+      })
   }, [])
-
-  const [filteredPersons, setFilteredPersons] = useState([...persons])
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -35,12 +33,11 @@ const App = () => {
       alert(`${newName} is already added to phonebook`)
       setNewName("")
     } else if (newName != "") {
-      axios
-      .post("http://localhost:3001/persons", newPerson)
-      .then(response => {
-        setPersons(persons.concat(response.data))
-        setFilteredPersons(persons.concat(response.data))
-      })
+      personsService
+        .create(newPerson)
+        .then(newPerson => {
+          setPersons(persons.concat(newPerson))
+        })
       setNewName("")
     }
   }
@@ -55,12 +52,14 @@ const App = () => {
 
   const handleSearchFilter = (event) => {
     setSearchFilter(event.target.value)
-    if (event.target.value != "") {
-      setFilteredPersons(persons.filter(person => person.name.toLowerCase().includes(event.target.value.toLowerCase())))
-    } else {
-      setFilteredPersons(persons)
-    }
   }
+
+  const filteredPersons = searchFilter !== ""
+    ? persons.filter(person => person.name.toLowerCase().includes(event.target.value.toLowerCase()))
+    : persons
+
+  console.log(filteredPersons)
+
 
   return (
     <div>
@@ -79,7 +78,7 @@ const App = () => {
       />
       <h2>Numbers</h2>
       <Persons
-        persons={persons}
+        persons={filteredPersons}
       />
     </div>
   )

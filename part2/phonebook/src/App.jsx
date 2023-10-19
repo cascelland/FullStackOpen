@@ -12,7 +12,10 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchFilter, setSearchFilter] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
+  const [message, setMessage] = useState({
+    text: "",
+    type: ""
+  })
 
   useEffect(() => {
     personsService
@@ -40,9 +43,9 @@ const App = () => {
           .then(() => {
             setNewName("")
             setNewNumber("")
-            setErrorMessage(`Updated ${newPerson.name}`)
+            setMessage({ text: `Updated ${newPerson.name}`, type: "success" })
             setTimeout(() => {
-              setErrorMessage('')
+              setMessage({ text: "", type: "" })
             }, 5000);
           })
       }
@@ -55,9 +58,12 @@ const App = () => {
         .then(() => {
           setNewName("")
           setNewNumber("")
-          setErrorMessage(`Added ${newPerson.name}`)
+          setMessage({
+            text: `Added ${newPerson.name}`,
+            type: 'success'
+          })
           setTimeout(() => {
-            setErrorMessage('')
+            setMessage({ text: "", type: "" })
           }, 5000);
         })
     }
@@ -83,6 +89,15 @@ const App = () => {
         .then(() =>
           setPersons(persons.filter(person => person.id !== id))
         )
+        .catch(() => {
+          setMessage({
+            text: `Information of ${name} has already been deleted`,
+            type: 'error'
+          })
+          setTimeout(() => {
+            setMessage({ text: "", type: "" })
+          }, 5000);
+        })
     }
   }
 
@@ -93,7 +108,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} />
+      <Notification message={message} />
       <Filter
         searchFilter={searchFilter}
         handleSearchFilter={handleSearchFilter}

@@ -12,7 +12,6 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [searchFilter, setSearchFilter] = useState('')
 
-
   useEffect(() => {
     personsService
       .getAll()
@@ -29,17 +28,28 @@ const App = () => {
     }
 
     if (persons.some((person) => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
-      setNewName("")
-      setNewNumber("")
-    } else if (newName != "") {
+      if (window.confirm(`${newName} is already in the phonebook, replace the number?`)) {
+        const id = persons.find(person => person.name === newName).id
+        personsService
+          .update(id, newPerson)
+          .then(updatedPerson => {
+            setPersons(persons.map(person => person.id !== id ? person : updatedPerson))
+          })
+          .then(() => {
+            setNewName("")
+            setNewNumber("")
+          })
+      }
+    } else if (newName !== "") {
       personsService
         .create(newPerson)
         .then(newPerson => {
           setPersons(persons.concat(newPerson))
         })
-      setNewName("")
-      setNewNumber("")
+        .then(() => {
+          setNewName("")
+          setNewNumber("")
+        })
     }
   }
 

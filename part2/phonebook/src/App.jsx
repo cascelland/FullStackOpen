@@ -102,7 +102,7 @@ const App = () => {
   }
 
   const filteredPersons = searchFilter !== ""
-    ? persons.filter(person => person.name.toLowerCase().includes(event.target.value.toLowerCase()))
+    ? persons.filter(person => person.name.toLowerCase().includes(searchFilter.toLowerCase()))
     : persons
 
   return (

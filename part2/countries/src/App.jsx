@@ -2,22 +2,24 @@ import { useEffect, useState } from "react"
 
 import countriesService from "./services/countries"
 
-const Countries = ({ countries }) => {
-  if (countries.length > 10) {
+const Countries = (props) => {
+  if (props.countries.length > 10) {
     return <p>Too many matches, specify another filter</p>
   }
 
-  if (countries.length > 1 && countries.length <= 10) {
+  if (props.countries.length > 1 && props.countries.length <= 10) {
     return (
       <div>
-        {countries.map(c => <p key={c.name.common}>{c.name.common}</p>)}
+        {props.countries.map(c =>
+          <p key={c.cca2}>{c.name.common} <button onClick={() => props.handleShow(c.name.common)}>show</button></p>
+        )}
       </div>
     )
   }
 
-  if (countries.length === 1) {
+  if (props.countries.length === 1) {
     return (
-      <Country country={countries[0]} />
+      <Country country={props.countries[0]} />
     )
   }
 }
@@ -39,11 +41,10 @@ const Country = ({ country }) => {
   )
 }
 
-
-
 const App = () => {
   const [searchFilter, setSearchFilter] = useState("")
   const [countries, setCountries] = useState([])
+  const [filteredCountries, setFilteredCountries] = useState([])
 
   useEffect(() => {
     countriesService
@@ -57,12 +58,18 @@ const App = () => {
   }, [])
 
   const handleSearchFilter = (event) => {
+    const filtered = event.target.value !== ""
+      ? countries.filter(country => country.name.common.toLowerCase().includes(event.target.value.toLowerCase()))
+      : countries
+
     setSearchFilter(event.target.value)
+    setFilteredCountries(filtered)
   }
 
-  const filteredCountries = searchFilter !== ""
-    ? countries.filter(country => country.name.common.toLowerCase().includes(searchFilter.toLowerCase()))
-    : countries
+  const handleShow = name => {
+    const country = countries.find(c => c.name.common === name)
+    setFilteredCountries([country])
+  }
 
   return (
     <div>
@@ -70,7 +77,9 @@ const App = () => {
         value={searchFilter}
         onChange={handleSearchFilter}
       />
-      <Countries countries={filteredCountries} />
+      {searchFilter != "" &&
+        <Countries countries={filteredCountries} handleShow={(name) => handleShow(name)} />
+      }
     </div>
   )
 }

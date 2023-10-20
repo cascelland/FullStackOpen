@@ -1,50 +1,14 @@
 import { useEffect, useState } from "react"
 
 import countriesService from "./services/countries"
-
-const Countries = (props) => {
-  if (props.countries.length > 10) {
-    return <p>Too many matches, specify another filter</p>
-  }
-
-  if (props.countries.length > 1 && props.countries.length <= 10) {
-    return (
-      <div>
-        {props.countries.map(c =>
-          <p key={c.cca2}>{c.name.common} <button onClick={() => props.handleShow(c.name.common)}>show</button></p>
-        )}
-      </div>
-    )
-  }
-
-  if (props.countries.length === 1) {
-    return (
-      <Country country={props.countries[0]} />
-    )
-  }
-}
-
-const Country = ({ country }) => {
-  const languageKeys = Object.keys(country.languages)
-
-  return (
-    <div>
-      <h1>{country.name.common}</h1>
-      <p>capital {country.capital}</p>
-      <p>area {country.area}</p>
-      <h2>languages</h2>
-      <ul>
-        {languageKeys.map(k => <li key={k}>{country.languages[k]}</li>)}
-      </ul>
-      <img src={country.flags.png} alt={`Flag of ${country.name.commmon}`} />
-    </div>
-  )
-}
+import weatherService from "./services/weather"
+import Countries from "./components/Countries"
 
 const App = () => {
   const [searchFilter, setSearchFilter] = useState("")
   const [countries, setCountries] = useState([])
   const [filteredCountries, setFilteredCountries] = useState([])
+  const [weather, setWeather] = useState(null)
 
   useEffect(() => {
     countriesService
@@ -56,6 +20,21 @@ const App = () => {
         console.log(error)
       )
   }, [])
+
+  useEffect(() => {
+    if (filteredCountries.length === 1) {
+      weatherService
+        .getWeather(filteredCountries[0].capital)
+        .then(data => {
+          setWeather(data)
+        })
+        .catch(error => {
+          setWeather(null)
+          console.log(error)
+        })
+    }
+
+  }, [filteredCountries])
 
   const handleSearchFilter = (event) => {
     const filtered = event.target.value !== ""
@@ -78,7 +57,7 @@ const App = () => {
         onChange={handleSearchFilter}
       />
       {searchFilter != "" &&
-        <Countries countries={filteredCountries} handleShow={(name) => handleShow(name)} />
+        <Countries countries={filteredCountries} handleShow={(name) => handleShow(name)} weather={weather} />
       }
     </div>
   )

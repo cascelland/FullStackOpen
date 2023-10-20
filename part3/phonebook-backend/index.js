@@ -52,6 +52,31 @@ app.delete('/api/persons/:id', (req, res) => {
     res.status(204).end()
 })
 
+const getRandomInt = (min, max) => {
+    min = Math.ceil(min)
+    max = Math.floor(max)
+    let int = Math.floor(Math.random() * (max - min) + min)
+    const ids = persons.map(person => person.id)
+    while (ids.includes(int)) {
+        int = Math.max(Math.floor(Math.random() * (max - min) + min), persons.length + 1)
+    }
+    return int
+}
+
+app.post('/api/persons', (req, res) => {
+    const body = req.body
+
+    const person = {
+        id: getRandomInt(1, 99999),
+        name: body.name,
+        number: body.number
+    }
+
+    persons = persons.concat(person)
+
+    res.json(person)
+})
+
 const PORT = 3001
 
 app.listen(PORT, () => {

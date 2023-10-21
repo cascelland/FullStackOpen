@@ -5,7 +5,9 @@ const app = express()
 
 app.use(express.json())
 
-app.use(morgan('tiny'))
+morgan.token('body', req => {
+    return JSON.stringify(req.body)
+  })
 
 let persons = [
     {
@@ -67,6 +69,8 @@ const getRandomInt = (min, max) => {
     return int
 }
 
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+
 app.post('/api/persons', (req, res) => {
     const body = req.body
 
@@ -92,6 +96,8 @@ app.post('/api/persons', (req, res) => {
 
     res.json(person)
 })
+
+
 
 const PORT = 3001
 

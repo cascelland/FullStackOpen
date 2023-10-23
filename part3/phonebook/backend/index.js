@@ -67,6 +67,20 @@ app.post('/api/persons', (req, res, next) => {
         .catch(error => next(error))
 })
 
+app.put('/api/persons/:id', (req, res, next) => {
+    const body = req.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(req.params.id, person).then(updatedPerson => {
+        res.json(updatedPerson)
+    })
+        .catch(error => next(error))
+})
+
 const errorHandler = (err, req, res, next) => {
     console.log(err.message)
 

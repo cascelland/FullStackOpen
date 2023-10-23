@@ -37,8 +37,8 @@ const App = () => {
         const id = persons.find(person => person.name === newName).id
         personsService
           .update(id, newPerson)
-          .then(updatedPerson => {
-            setPersons(persons.map(person => person.id !== id ? person : updatedPerson))
+          .then(() => {
+            setPersons(persons.map(person => person.id !== id ? person : newPerson))
           })
           .then(() => {
             setNewName("")

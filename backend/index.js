@@ -33,6 +33,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name == 'CastError') {
     return response.status(400).send({ error: "wrong id format" })
+  } else if (error.name == 'ValidationError') {
+    return response.status(400).send({ error: error.message })
   }
 
   next(error)
@@ -63,14 +65,14 @@ app.get('/api/notes', (req, res) => {
   return maxId + 1
 } */
 
-app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
   const body = request.body
 
-  if (!body.content) {
-    return response.status(400).json({
-      error: 'content missing'
-    })
-  }
+  /*   if (body.content == undefined) {
+      return response.status(400).json({
+        error: 'content missing'
+      })
+    } */
 
   /*   const note = {
       content: body.content,
@@ -88,6 +90,7 @@ app.post('/api/notes', (request, response) => {
   note.save().then(savedNote => {
     response.json(savedNote)
   })
+    .catch(error => next(error))
 
   //response.json(note)
 })
@@ -114,8 +117,14 @@ app.get('/api/notes/:id', (request, response, next) => {
     .catch(error => { next(error) })
 })
 
+/* We notice that the backend has now a problem: 
+validations are not done when editing a note. 
+The documentation addresses the issue by explaining 
+that validations are not run by default when
+ findOneAndUpdate is executed. */
+
 app.put('/api/notes/:id', (request, response, next) => {
-  const body = request.body
+  const { content, important } = request.body
 
   /* Notice that the findByIdAndUpdate method receives a regular 
   JavaScript object as its parameter, and not a new note object 
@@ -130,9 +139,12 @@ app.put('/api/notes/:id', (request, response, next) => {
   which will cause our event handler to be called with the 
   new modified document instead of the original. */
 
-  Note.findByIdAndUpdate(request.params.id, note, { new: true }).then(updatedNote => {
-    response.json(updatedNote)
-  })
+  Note.findByIdAndUpdate(
+    request.params.id, { content, important },
+    { new: true, runValidators: true, context: 'query' })
+    .then(updatedNote => {
+      response.json(updatedNote)
+    })
     .catch(error => next(error))
 })
 

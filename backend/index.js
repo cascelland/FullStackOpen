@@ -1,10 +1,9 @@
 const express = require('express')
 const cors = require('cors')
-const mongoose = require('mongoose')
 
 /* if (process.argv.length<3) {
-    console.log("Password missing")
-    process.exit(1)
+  console.log("Password missing")
+  process.exit(1)
 } */
 
 //const password = process.env.PASSWORD
@@ -31,9 +30,9 @@ const requestLogger = (request, response, next) => {
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
-  if (error.name == 'CastError') {
-    return response.status(400).send({ error: "wrong id format" })
-  } else if (error.name == 'ValidationError') {
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'wrong id format' })
+  } else if (error.name === 'ValidationError') {
     return response.status(400).send({ error: error.message })
   }
 
@@ -60,8 +59,8 @@ app.get('/api/notes', (req, res) => {
 
 /* const generateId = () => {
   const maxId = notes.length > 0
-    ? Math.max(...notes.map(n => n.id))
-    : 0
+  ? Math.max(...notes.map(n => n.id))
+  : 0
   return maxId + 1
 } */
 
@@ -69,17 +68,17 @@ app.post('/api/notes', (request, response, next) => {
   const body = request.body
 
   /*   if (body.content == undefined) {
-      return response.status(400).json({
-        error: 'content missing'
-      })
-    } */
+    return response.status(400).json({
+    error: 'content missing'
+    })
+  } */
 
   /*   const note = {
-      content: body.content,
-      important: body.important || false,
-      date: new Date(),
-      id: generateId(),
-    } */
+    content: body.content,
+    important: body.important || false,
+    date: new Date(),
+    id: generateId(),
+  } */
 
   const note = new Note({
     content: body.content,
@@ -98,13 +97,13 @@ app.post('/api/notes', (request, response, next) => {
 app.get('/api/notes/:id', (request, response, next) => {
   /*  const id = Number(request.params.id)
    const note = notes.find(note => note.id === id)
- 
+
    if (note) {
      response.json(note)
    } else {
      response.status(404).end()
    }
- 
+
    response.json(note) */
 
   Note.findById(request.params.id).then(note => {
@@ -117,26 +116,26 @@ app.get('/api/notes/:id', (request, response, next) => {
     .catch(error => { next(error) })
 })
 
-/* We notice that the backend has now a problem: 
-validations are not done when editing a note. 
-The documentation addresses the issue by explaining 
+/* We notice that the backend has now a problem:
+validations are not done when editing a note.
+The documentation addresses the issue by explaining
 that validations are not run by default when
  findOneAndUpdate is executed. */
 
 app.put('/api/notes/:id', (request, response, next) => {
   const { content, important } = request.body
 
-  /* Notice that the findByIdAndUpdate method receives a regular 
-  JavaScript object as its parameter, and not a new note object 
+  /* Notice that the findByIdAndUpdate method receives a regular
+  JavaScript object as its parameter, and not a new note object
   created with the Note constructor function. */
 
-  const note = {
+  /* const note = {
     content: body.content,
     important: body.important
-  }
+  } */
 
-  /* We added the optional { new: true } parameter, 
-  which will cause our event handler to be called with the 
+  /* We added the optional { new: true } parameter,
+  which will cause our event handler to be called with the
   new modified document instead of the original. */
 
   Note.findByIdAndUpdate(
@@ -149,7 +148,7 @@ app.put('/api/notes/:id', (request, response, next) => {
 })
 
 app.delete('/api/notes/:id', (request, response, next) => {
-  Note.findByIdAndRemove(request.params.id).then(result => {
+  Note.findByIdAndRemove(request.params.id).then(() => {
     response.status(204).end()
   })
     .catch(error => next(error))

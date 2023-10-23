@@ -10,7 +10,7 @@ app.use(cors())
 app.use(express.static('dist'))
 
 app.use(express.json())
-app.use(morgan('tiny'))
+//app.use(morgan('tiny'))
 
 const Person = require('./models/person')
 
@@ -18,10 +18,14 @@ morgan.token('body', req => {
     return JSON.stringify(req.body)
 })
 
-app.get('/api/persons', (req, res) => {
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+
+
+app.get('/api/persons', (req, res, next) => {
     Person.find({}).then(persons => {
         res.json(persons)
     })
+        .catch(error => next(error))
 })
 
 app.get('/info', (req, res) => {
@@ -29,27 +33,27 @@ app.get('/info', (req, res) => {
     res.send(`Phonebook has info for ${persons.length} people.<br /><br />${date}`)
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id).then(person => {
         res.json(person)
     })
+        .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndDelete(req.params.id).then(result => {
         res.status(204).end()
     })
+        .catch(error => next(error))
 })
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
-
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
 
     if (!body.name || !body.number) {
-        return res.status(400).json({
-            error: "name or number are missing"
-        })
+        const error = new Error("Name or number missing")
+        error.name = "NameOrNumberMissing"
+        next(error)
     }
 
     const person = new Person({
@@ -60,9 +64,24 @@ app.post('/api/persons', (req, res) => {
     person.save().then(person => {
         res.json(person)
     })
+        .catch(error => next(error))
 })
 
+const errorHandler = (err, req, res, next) => {
+    console.log(err.message)
 
+    if (err.name == "CastError") {
+        return res.status(400).send({ error: "wrong id format" })
+    }
+
+    if (err.name == "NameOrNumberMissing") {
+        return res.status(400).send({ error: "name or number are missing" })
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 

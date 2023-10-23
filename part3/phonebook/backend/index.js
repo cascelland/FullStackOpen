@@ -28,9 +28,12 @@ app.get('/api/persons', (req, res, next) => {
         .catch(error => next(error))
 })
 
-app.get('/info', (req, res) => {
+app.get('/info', (req, res, next) => {
     const date = new Date()
-    res.send(`Phonebook has info for ${persons.length} people.<br /><br />${date}`)
+    Person.find({}).then(persons => {
+        res.send(`Phonebook has info for ${persons.length} people.<br /><br />${date}`)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {

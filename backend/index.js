@@ -28,31 +28,22 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name == 'CastError') {
+    return response.status(400).send({ error: "wrong id format" })
+  }
+
+  next(error)
+}
+
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(express.json())
 app.use(requestLogger)
-
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    important: true
-  },
-  {
-    id: 2,
-    content: "Browser can execute only JavaScript",
-    important: false
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    important: true
-  }
-]
-
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
@@ -101,31 +92,59 @@ app.post('/api/notes', (request, response) => {
   //response.json(note)
 })
 
-app.get('/api/notes/:id', (request, response) => {
- /*  const id = Number(request.params.id)
-  const note = notes.find(note => note.id === id)
+app.get('/api/notes/:id', (request, response, next) => {
+  /*  const id = Number(request.params.id)
+   const note = notes.find(note => note.id === id)
+ 
+   if (note) {
+     response.json(note)
+   } else {
+     response.status(404).end()
+   }
+ 
+   response.json(note) */
 
-  if (note) {
-    response.json(note)
-  } else {
-    response.status(404).end()
-  }
-
-  response.json(note) */
-  
   Note.findById(request.params.id).then(note => {
-    response.json(note)
+    if (note) {
+      response.json(note)
+    } else {
+      response.status(404).end()
+    }
   })
+    .catch(error => { next(error) })
 })
 
-app.delete('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
-  notes = notes.filter(note => note.id !== id)
+app.put('/api/notes/:id', (request, response, next) => {
+  const body = request.body
 
-  response.status(204).end()
+  /* Notice that the findByIdAndUpdate method receives a regular 
+  JavaScript object as its parameter, and not a new note object 
+  created with the Note constructor function. */
+
+  const note = {
+    content: body.content,
+    important: body.important
+  }
+
+  /* We added the optional { new: true } parameter, 
+  which will cause our event handler to be called with the 
+  new modified document instead of the original. */
+
+  Note.findByIdAndUpdate(request.params.id, note, { new: true }).then(updatedNote => {
+    response.json(updatedNote)
+  })
+    .catch(error => next(error))
+})
+
+app.delete('/api/notes/:id', (request, response, next) => {
+  Note.findByIdAndRemove(request.params.id).then(result => {
+    response.status(204).end()
+  })
+    .catch(error => next(error))
 })
 
 app.use(unknownEndpoint)
+app.use(errorHandler)
 
 //const PORT = 3001
 const PORT = process.env.PORT || 3001

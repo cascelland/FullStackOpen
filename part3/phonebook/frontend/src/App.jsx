@@ -48,12 +48,15 @@ const App = () => {
               setMessage({ text: "", type: "" })
             }, 5000);
           })
+          .catch(error => {
+            setMessage({ text: error.response.data.error, type: 'error' })
+          })
       }
     } else if (newName !== "") {
       personsService
         .create(newPerson)
-        .then(newPerson => {
-          setPersons(persons.concat(newPerson))
+        .then(createdPerson => {
+          setPersons(persons.concat(createdPerson))
         })
         .then(() => {
           setNewName("")
@@ -66,6 +69,10 @@ const App = () => {
             setMessage({ text: "", type: "" })
           }, 5000);
         })
+        .catch(error => {
+          setMessage({ text: error.response.data.error, type: 'error' })
+        })
+
     }
   }
 

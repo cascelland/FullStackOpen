@@ -36,6 +36,28 @@ test('blog ids are defined', async () => {
   })
 })
 
+test('blog is created', async () => {
+  const newBlog = {
+    title: 'My name is',
+    author: 'Giovanni Giorgio',
+    url: 'lol',
+    likes: 7,
+  }
+
+  await api.post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
+
+  const authors = blogsAtEnd.map(b => b.author)
+  expect(authors).toContain(
+    'Giovanni Giorgio'
+  )
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })

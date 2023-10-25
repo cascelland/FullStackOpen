@@ -83,6 +83,27 @@ test('undefined title or url return 400', async () => {
     .expect(400)
 })
 
+describe('deletion of a blog entry', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    expect(blogsAtEnd).toHaveLength(
+      helper.initialBlogs.length - 1
+    )
+
+    const ids = blogsAtEnd.map(r => r.id)
+
+    expect(ids).not.toContain(blogToDelete.id)
+  })
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })

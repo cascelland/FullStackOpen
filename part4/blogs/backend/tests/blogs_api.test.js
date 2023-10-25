@@ -104,6 +104,22 @@ describe('deletion of a blog entry', () => {
   })
 })
 
+describe('update of a blog entry', () => {
+  test('succeeds if only updating a parameter', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+    const updatedLikes = { likes: 38 }
+
+    await api.put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updatedLikes)
+      .expect(200)
+
+    const updatedBlogs = await helper.blogsInDb()
+
+    expect(updatedBlogs[0].likes).toBe(38)
+  })
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })

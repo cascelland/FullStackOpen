@@ -58,6 +58,20 @@ test('blog is created', async () => {
   )
 })
 
+test('undefined likes are set to 0', async () => {
+  const newBlog = {
+    title: 'My name is',
+    author: 'Giovanni Giorgio',
+    url: 'lol'
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+
+  expect(response.body.likes).toBe(0)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })

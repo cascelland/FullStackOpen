@@ -72,6 +72,17 @@ test('undefined likes are set to 0', async () => {
   expect(response.body.likes).toBe(0)
 })
 
+test('undefined title or url return 400', async () => {
+  const newBlog = {
+    author: 'Giovanni Giorgio',
+    likes: 300
+  }
+
+  await api.post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })

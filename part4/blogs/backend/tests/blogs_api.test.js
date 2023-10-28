@@ -3,18 +3,48 @@ const supertest = require('supertest')
 
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test_helper')
 
 const api = supertest(app)
 
+
+
+beforeAll(async () => {
+  await Blog.deleteMany({})
+  await User.deleteMany({})
+
+  await api
+    .post('/api/users')
+    .send({
+      username: 'testUser',
+      password: 'testPassword'
+    })
+})
+
 beforeEach(async () => {
   await Blog.deleteMany({})
 
-  for (let blog of helper.initialBlogs) {
+  const result = await User.findOne({ username: 'testUser' })
+
+  for (let blog of await helper.initialBlogs) {
     let blogObject = new Blog(blog)
+    blogObject['user'] = result.id
     await blogObject.save()
   }
 })
+
+const getToken = async () => {
+  const response = await api
+    .post('/api/login')
+    .send({
+      username: 'testUser',
+      password: 'testPassword'
+    })
+
+  return response.body.token
+
+}
 
 test('blogs are in the json format', async () => {
   await api.get('/api/blogs')
@@ -37,14 +67,18 @@ test('blog ids are defined', async () => {
 })
 
 test('blog is created', async () => {
+  const result = User.findOne({ username: 'testUser' })
+
   const newBlog = {
     title: 'My name is',
     author: 'Giovanni Giorgio',
     url: 'lol',
     likes: 7,
+    user: result.id
   }
 
   await api.post('/api/blogs')
+    .set('Authorization', `Bearer ${await getToken()}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -59,14 +93,18 @@ test('blog is created', async () => {
 })
 
 test('undefined likes are set to 0', async () => {
+  const result = User.findOne({ username: 'testUser' })
+
   const newBlog = {
     title: 'My name is',
     author: 'Giovanni Giorgio',
-    url: 'lol'
+    url: 'lol',
+    user: result.id
   }
 
   const response = await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${await getToken()}`)
     .send(newBlog)
 
   expect(response.body.likes).toBe(0)
@@ -79,8 +117,22 @@ test('undefined title or url return 400', async () => {
   }
 
   await api.post('/api/blogs')
+    .set('Authorization', `Bearer ${await getToken()}`)
     .send(newBlog)
     .expect(400)
+})
+
+test('no token returns 401', async () => {
+  const newBlog = {
+    title: 'My name is',
+    author: 'Giovanni Giorgio',
+    url: 'lol'
+  }
+
+  await api.post('/api/blogs')
+    //.set('Authorization', `Bearer ${await getToken()}`)
+    .send(newBlog)
+    .expect(401)
 })
 
 describe('deletion of a blog entry', () => {
@@ -90,6 +142,7 @@ describe('deletion of a blog entry', () => {
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${await getToken()}`)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
@@ -111,6 +164,7 @@ describe('update of a blog entry', () => {
     const updatedLikes = { likes: 38 }
 
     await api.put(`/api/blogs/${blogToUpdate.id}`)
+      .set('Authorization', `Bearer ${await getToken()}`)
       .send(updatedLikes)
       .expect(200)
 

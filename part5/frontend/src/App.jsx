@@ -3,6 +3,14 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+const Notification = (props) => {
+  return (
+    <p>
+      {props.error}
+    </p>
+  )
+}
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
 
@@ -14,6 +22,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+
+  const [error, setError] = useState('')
 
 
   useEffect(() => {
@@ -33,11 +43,18 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    const user = await loginService.login({ username, password })
-    setUser(user)
-    window.localStorage.setItem('loggedUser', JSON.stringify(user))
-    setUsername('')
-    setPassword('')
+    try {
+      const user = await loginService.login({ username, password })
+      setUser(user)
+      window.localStorage.setItem('loggedUser', JSON.stringify(user))
+      setUsername('')
+      setPassword('')
+    } catch (error) {
+      setError(error.message)
+      setTimeout(() => {
+        setError('')
+      }, 5000)
+    }
   }
 
   const handleCreateNew = async (event) => {
@@ -47,10 +64,23 @@ const App = () => {
       author: author,
       url: url
     }
+    try {
+      blogService.createToken(user.token)
+      const newBlog = await blogService.create(blog)
+      setBlogs(blogs.concat(newBlog))
 
-    blogService.createToken(user.token)
-    const newBlog = await blogService.create(blog)
-    setBlogs(blogs.concat(newBlog))
+      setError(`created new blog: ${newBlog.title}`)
+      setTimeout(() => {
+        setError('')
+      }, 5000)
+
+    } catch (error) {
+      setError(error.message)
+      setTimeout(() => {
+        setError('')
+      }, 5000)
+    }
+
   }
 
   const loginForm = () => (
@@ -120,7 +150,7 @@ const App = () => {
             value={url}
             onChange={({ target }) => setUrl(target.value)} />
         </div>
-        
+
         <button type="submit">login</button>
       </form>
     </div>
@@ -128,6 +158,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification error={error} />
       {!user && loginForm()}
       {user && blogList()}
       {user && createNew()}

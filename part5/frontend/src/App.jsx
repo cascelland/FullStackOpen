@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -24,6 +25,8 @@ const App = () => {
   const [url, setUrl] = useState('')
 
   const [error, setError] = useState('')
+
+  const newBlogRef = useRef()
 
 
   useEffect(() => {
@@ -68,6 +71,7 @@ const App = () => {
       blogService.createToken(user.token)
       const newBlog = await blogService.create(blog)
       setBlogs(blogs.concat(newBlog))
+      newBlogRef.current.toggleVisibility()
 
       setError(`created new blog: ${newBlog.title}`)
       setTimeout(() => {
@@ -90,7 +94,7 @@ const App = () => {
         <div>
           username
           <input
-            type="text"
+            type="  text"
             name='Username'
             value={username}
             onChange={({ target }) => setUsername(target.value)} />
@@ -151,7 +155,7 @@ const App = () => {
             onChange={({ target }) => setUrl(target.value)} />
         </div>
 
-        <button type="submit">login</button>
+        <button type="submit">create</button>
       </form>
     </div>
   )
@@ -159,9 +163,17 @@ const App = () => {
   return (
     <div>
       <Notification error={error} />
-      {!user && loginForm()}
+      {!user &&
+        <Togglable label="login">
+          {loginForm()}
+        </Togglable>
+      }
       {user && blogList()}
-      {user && createNew()}
+      {user &&
+        <Togglable label="add blog" ref={newBlogRef}>
+          {createNew()}
+        </Togglable>
+      }
 
     </div>
   )

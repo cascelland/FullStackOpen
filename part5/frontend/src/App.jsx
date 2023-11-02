@@ -63,11 +63,12 @@ const App = () => {
     const blog = {
       title: title,
       author: author,
-      url: url
+      url: url,
     }
     try {
       blogService.createToken(user.token)
       const newBlog = await blogService.create(blog)
+      newBlog['user'] = user
       setBlogs(blogs.concat(newBlog))
       newBlogRef.current.toggleVisibility()
 

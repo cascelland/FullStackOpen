@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import BlogForm from './components/BlogForm'
 
 const Notification = (props) => {
   return (
@@ -20,9 +21,7 @@ const App = () => {
 
   const [user, setUser] = useState(null)
 
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+
 
   const [error, setError] = useState('')
 
@@ -60,8 +59,7 @@ const App = () => {
     }
   }
 
-  const handleCreateNew = async (event) => {
-    event.preventDefault()
+  const handleCreateNew = async (title, author, url) => {
     const blog = {
       title: title,
       author: author,
@@ -127,37 +125,10 @@ const App = () => {
   )
 
   const createNew = () => (
-    <div>
-      <h2>create new</h2>
-      <form onSubmit={handleCreateNew}>
-        <div>
-          title
-          <input
-            type="text"
-            name='title'
-            value={title}
-            onChange={({ target }) => setTitle(target.value)} />
-        </div>
-        <div>
-          author
-          <input
-            type="text"
-            name='author'
-            value={author}
-            onChange={({ target }) => setAuthor(target.value)} />
-        </div>
-        <div>
-          url
-          <input
-            type="text"
-            name='url'
-            value={url}
-            onChange={({ target }) => setUrl(target.value)} />
-        </div>
+    <Togglable label="add blog" ref={newBlogRef}>
+      <BlogForm handleNewBlog={handleCreateNew} />
+    </Togglable>
 
-        <button type="submit">create</button>
-      </form>
-    </div>
   )
 
   return (
@@ -169,11 +140,7 @@ const App = () => {
         </Togglable>
       }
       {user && blogList()}
-      {user &&
-        <Togglable label="add blog" ref={newBlogRef}>
-          {createNew()}
-        </Togglable>
-      }
+      {user && createNew()}
 
     </div>
   )

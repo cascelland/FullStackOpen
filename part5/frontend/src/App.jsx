@@ -86,6 +86,12 @@ const App = () => {
 
   }
 
+  const updateLike = async newBlog => {
+    const updatedBlog = JSON.parse(await blogService.update(newBlog))
+    updatedBlog['user'] = user
+    setBlogs(blogs.map(blog => blog.id != updatedBlog.id ? blog : updatedBlog))
+  }
+
   const loginForm = () => (
     <div>
       <h2>login to application</h2>
@@ -120,7 +126,7 @@ const App = () => {
       }}>logout</button>
       </p>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} handleLike={updateLike} />
       )}
     </div>
   )

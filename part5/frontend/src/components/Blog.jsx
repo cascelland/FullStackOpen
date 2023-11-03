@@ -1,8 +1,9 @@
 import { useState } from "react"
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleLike }) => {
 
   const [show, setShow] = useState(false)
+  const [newBlog, setNewBlog] = useState(blog)
 
   const blogStyle = {
     paddingTop: 10,
@@ -12,21 +13,28 @@ const Blog = ({ blog }) => {
     marginBottom: 5
   }
 
-  return(
+  const updateLike = async (event) => {
+    event.preventDefault()
+    const updatedBlog = ({ ...blog, likes: blog.likes + 1 })
+    await handleLike(updatedBlog)
+    setNewBlog(updatedBlog)
+  }
+
+  return (
     <div style={blogStyle}>
-    {blog.title} {blog.author} <button onClick={() => setShow(!show)}>{show ? 'hide' : 'show'}</button>
-    {show && 
-      <div>
-        {blog.url}
-        <br />
-        likes: {blog.likes} <button>like</button>
-        <br />
-        {blog.user && 
-          blog.user.name
-        }
+      {blog.title} {blog.author} <button onClick={() => setShow(!show)}>{show ? 'hide' : 'show'}</button>
+      {show &&
+        <div>
+          {blog.url}
+          <br />
+          likes: {newBlog.likes} <button onClick={updateLike}>like</button>
+          <br />
+          {blog.user &&
+            blog.user.name
+          }
         </div>
-    }
-  </div>  
+      }
+    </div>
   )
 
 }

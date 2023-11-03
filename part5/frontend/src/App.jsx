@@ -99,6 +99,19 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (newBlog) => {
+    try {
+      blogService.createToken(user.token)
+      await blogService.remove(newBlog)
+      setBlogs(blogs.filter(blog => blog.id != newBlog.id))
+    } catch(error) {
+      setError(error.message)
+      setTimeout(() => {
+        setError('')
+      }, 5000)
+    }
+  }
+
   const loginForm = () => (
     <div>
       <h2>login to application</h2>
@@ -134,7 +147,7 @@ const App = () => {
       </p>
       {
         blogs.sort((b1, b2) => b2.likes - b1.likes).map(blog =>
-          <Blog key={blog.id} blog={blog} handleLike={updateLike} />
+          <Blog key={blog.id} blog={blog} handleLike={updateLike} handleDelete={deleteBlog} />
         )
       }
     </div>

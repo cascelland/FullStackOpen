@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const Blog = ({ blog, handleLike }) => {
+const Blog = ({ blog, handleLike, handleDelete }) => {
 
   const [show, setShow] = useState(false)
   const [newBlog, setNewBlog] = useState(blog)
@@ -20,6 +20,13 @@ const Blog = ({ blog, handleLike }) => {
     setNewBlog(updatedBlog)
   }
 
+  const deleteBlog = async (event) => {
+    event.preventDefault()
+    if (window.confirm(`Delete ${blog.title} by ${blog.author}?`)){
+      await handleDelete(blog)
+    }
+  }
+
   return (
     <div style={blogStyle}>
       {blog.title} {blog.author} <button onClick={() => setShow(!show)}>{show ? 'hide' : 'show'}</button>
@@ -32,6 +39,8 @@ const Blog = ({ blog, handleLike }) => {
           {blog.user &&
             blog.user.name
           }
+          <br />
+          <button onClick={deleteBlog}>delete</button>
         </div>
       }
     </div>

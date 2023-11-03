@@ -87,9 +87,16 @@ const App = () => {
   }
 
   const updateLike = async newBlog => {
-    const updatedBlog = JSON.parse(await blogService.update(newBlog))
-    updatedBlog['user'] = user
-    setBlogs(blogs.map(blog => blog.id != updatedBlog.id ? blog : updatedBlog))
+    try {
+      const updatedBlog = JSON.parse(await blogService.update(newBlog))
+      updatedBlog['user'] = user
+      setBlogs(blogs.map(blog => blog.id != updatedBlog.id ? blog : updatedBlog))
+    } catch (error) {
+      setError(error.message)
+      setTimeout(() => {
+        setError('')
+      }, 5000)
+    }
   }
 
   const loginForm = () => (
@@ -125,9 +132,11 @@ const App = () => {
         setUser(null)
       }}>logout</button>
       </p>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} handleLike={updateLike} />
-      )}
+      {
+        blogs.sort((b1, b2) => b2.likes - b1.likes).map(blog =>
+          <Blog key={blog.id} blog={blog} handleLike={updateLike} />
+        )
+      }
     </div>
   )
 

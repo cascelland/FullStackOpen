@@ -35,7 +35,7 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
         <div className='url-likes'>
           {blog.url}
           <br />
-          likes: {newBlog.likes} <button onClick={updateLike}>like</button>
+          likes: {newBlog.likes} <button onClick={updateLike} placeholder='like button'>like</button>
           <br />
           {blog.user &&
             blog.user.name

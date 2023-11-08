@@ -17,10 +17,12 @@ beforeAll(async () => {
 
 describe('<Blog />', () => {
   let container
+  let handleLike
+  let handleDelete
 
   beforeEach(() => {
-    const handleLike = jest.fn()
-    const handleDelete = jest.fn()
+    handleLike = jest.fn()
+    handleDelete = jest.fn()
 
     container = render(
       <Blog blog={blog} handleDelete={handleDelete} handleLike={handleLike} />
@@ -39,5 +41,19 @@ describe('<Blog />', () => {
     await user.click(button)
     const div = container.querySelector('.url-likes')
     expect(div).toBeInTheDocument()
+  })
+
+  test('Clicking like twice calls handler twice', async () => {
+    const user = userEvent.setup()
+    const showButton = screen.getByText('show')
+
+    await user.click(showButton)
+
+    const likeButton = screen.getByPlaceholderText('like button')
+
+    await user.click(likeButton)
+    await user.click(likeButton)
+
+    expect(handleLike.mock.calls).toHaveLength(2)
   })
 })

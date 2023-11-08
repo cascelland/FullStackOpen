@@ -32,7 +32,7 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
     <div style={blogStyle}>
       {blog.title} {blog.author} <button onClick={() => setShow(!show)}>{show ? 'hide' : 'show'}</button>
       {show &&
-        <div>
+        <div className='url-likes'>
           {blog.url}
           <br />
           likes: {newBlog.likes} <button onClick={updateLike}>like</button>
@@ -49,10 +49,10 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
 
 }
 
-Blog.PropTypes = {
+Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  handleLike: PropTypes.object.isRequired,
-  handleDelete: PropTypes.object.isRequired
+  handleLike: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired
 }
 
 export default Blog

@@ -1,6 +1,7 @@
 import React from 'react'
 import '@testing-library/jest-dom'
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
 let blog = {}
@@ -29,5 +30,14 @@ describe('<Blog />', () => {
   test('at start the children are not displayed', () => {
     const div = container.querySelector('.url-likes')
     expect(div).not.toBeInTheDocument()
+  })
+
+  test('URL and likes are shown when button is clicked', async () => {
+    const user = userEvent.setup()
+    const button = screen.getByText('show')
+
+    await user.click(button)
+    const div = container.querySelector('.url-likes')
+    expect(div).toBeInTheDocument()
   })
 })

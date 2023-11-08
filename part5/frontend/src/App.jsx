@@ -90,7 +90,7 @@ const App = () => {
     try {
       const updatedBlog = JSON.parse(await blogService.update(newBlog))
       updatedBlog['user'] = user
-      setBlogs(blogs.map(blog => blog.id != updatedBlog.id ? blog : updatedBlog))
+      setBlogs(blogs.map(blog => blog.id !== updatedBlog.id ? blog : updatedBlog))
     } catch (error) {
       setError(error.message)
       setTimeout(() => {
@@ -103,7 +103,7 @@ const App = () => {
     try {
       blogService.createToken(user.token)
       await blogService.remove(newBlog)
-      setBlogs(blogs.filter(blog => blog.id != newBlog.id))
+      setBlogs(blogs.filter(blog => blog.id !== newBlog.id))
     } catch(error) {
       setError(error.message)
       setTimeout(() => {

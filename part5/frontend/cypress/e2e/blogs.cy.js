@@ -28,7 +28,7 @@ describe('Blog app', function () {
       cy.contains('login').click()
 
       cy.get('input:first').type('testUser')
-      cy.get('input:last').type('testPassword')
+      cy.get('input:last').type('wrong')
       cy.get('#login-button').click()
       cy.should('not.contain', 'testUser logged in')
     })
@@ -55,6 +55,13 @@ describe('Blog app', function () {
       cy.get('html').should('contain', 'likes: 0')
       cy.get('#like-button').click()
       cy.get('html').should('contain', 'likes: 1')
+    })
+
+    it('A blog can be deleted', function() {
+      cy.createBlog()
+      cy.contains('show').click()
+      cy.contains('delete').click()
+      cy.should('not.contain', 'test title test author')
     })
   })
 

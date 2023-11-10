@@ -2,6 +2,8 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 
 const Blog = ({ blog, handleLike, handleDelete }) => {
+  console.log(JSON.parse(window.localStorage.getItem('loggedUser')).username)
+  console.log('blog.user', blog.user.username)
 
   const [show, setShow] = useState(false)
   const [newBlog, setNewBlog] = useState(blog)
@@ -23,7 +25,7 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
 
   const deleteBlog = async (event) => {
     event.preventDefault()
-    if (window.confirm(`Delete ${blog.title} by ${blog.author}?`)){
+    if (window.confirm(`Delete ${blog.title} by ${blog.author}?`)) {
       await handleDelete(blog)
     }
   }
@@ -41,7 +43,9 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
             blog.user.name
           }
           <br />
-          <button onClick={deleteBlog}>delete</button>
+          {JSON.parse(window.localStorage.getItem('loggedUser')).username === blog.user.username &&
+            <button onClick={deleteBlog}>delete</button>
+          }
         </div>
       }
     </div>

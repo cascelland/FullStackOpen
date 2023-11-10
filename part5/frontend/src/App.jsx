@@ -119,7 +119,7 @@ const App = () => {
         <div>
           username
           <input
-            type="  text"
+            type="text"
             name='Username'
             value={username}
             onChange={({ target }) => setUsername(target.value)} />

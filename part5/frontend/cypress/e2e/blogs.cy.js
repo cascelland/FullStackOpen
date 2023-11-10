@@ -6,6 +6,11 @@ describe('Blog app', function () {
       password: 'testPassword'
     }
     cy.request('POST', 'http://localhost:3003/api/users', user)
+    const secondUser = {
+      username: 'testSecondUser',
+      password: 'testSecondPassword'
+    }
+    cy.request('POST', 'http://localhost:3003/api/users', secondUser)
     cy.visit('http://localhost:5173')
   })
 
@@ -57,11 +62,19 @@ describe('Blog app', function () {
       cy.get('html').should('contain', 'likes: 1')
     })
 
-    it('A blog can be deleted', function() {
+    it('A blog can be deleted', function () {
       cy.createBlog()
       cy.contains('show').click()
       cy.contains('delete').click()
       cy.should('not.contain', 'test title test author')
+    })
+
+    it('Only the creator can see delete button on their blog', function () {
+      cy.createBlog()
+      cy.contains('logout').click()
+      cy.login({ username: 'testSecondUser', password: 'testSecondPassword' })
+      cy.contains('show').click()
+      cy.get('html').should('not.contain', 'delete')
     })
   })
 

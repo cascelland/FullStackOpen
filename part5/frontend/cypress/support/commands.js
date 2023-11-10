@@ -33,11 +33,11 @@ Cypress.Commands.add('login', ({ username, password }) => {
   })
 })
 
-Cypress.Commands.add('createBlog', () => {
+Cypress.Commands.add('createBlog', (title, author, url) => {
   cy.contains('add blog').click()
 
-  cy.get('#blog-title').type('test title')
-  cy.get('#blog-author').type('test author')
-  cy.get('#blog-url').type('test url')
+  cy.get('#blog-title').type(title || 'test title')
+  cy.get('#blog-author').type(author || 'test author')
+  cy.get('#blog-url').type(url || 'test url')
   cy.get('#submit-blog').click()
 })

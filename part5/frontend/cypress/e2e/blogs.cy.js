@@ -76,6 +76,35 @@ describe('Blog app', function () {
       cy.contains('show').click()
       cy.get('html').should('not.contain', 'delete')
     })
+
+    it('blogs are ordered according to likes', function () {
+
+      cy.createBlog('second most likes', 'second most liked author', 'url')
+      cy.contains('second most likes second most liked author')
+        .contains('show')
+        .click()
+      cy.get('#like-button').click().click()
+      cy.contains('hide').click()
+
+      cy.createBlog('first most likes', 'first most liked author', 'url')
+      cy.contains('first most likes first most liked author')
+        .contains('show')
+        .click()
+      cy.get('#like-button').click().click().click()
+      cy.contains('hide').click()
+
+      cy.createBlog('third most likes', 'third most liked author', 'url')
+      cy.contains('third most likes third most liked author')
+        .contains('show')
+        .click()
+      cy.get('#like-button').click()
+      cy.contains('hide').click()
+
+      cy.get('.blog').eq(0).should('contain', 'first most likes first most liked author')
+      cy.get('.blog').eq(1).should('contain', 'second most likes second most liked author')
+      cy.get('.blog').eq(2).should('contain', 'third most likes third most liked author')
+
+    })
   })
 
 })

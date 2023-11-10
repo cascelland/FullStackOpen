@@ -2,8 +2,6 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 
 const Blog = ({ blog, handleLike, handleDelete }) => {
-  console.log(JSON.parse(window.localStorage.getItem('loggedUser')).username)
-  console.log('blog.user', blog.user.username)
 
   const [show, setShow] = useState(false)
   const [newBlog, setNewBlog] = useState(blog)
@@ -31,7 +29,7 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       {blog.title} {blog.author} <button onClick={() => setShow(!show)}>{show ? 'hide' : 'show'}</button>
       {show &&
         <div className='url-likes'>

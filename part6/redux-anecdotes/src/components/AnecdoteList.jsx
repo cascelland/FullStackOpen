@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from "react-redux"
 import { addVote } from "../reducers/anecdoteReducer"
+import { removeNotification, setNotification } from "../reducers/notificationReducer"
 
 const Anecdote = ({ anecdote, handleVote }) => {
   return (
@@ -19,7 +20,7 @@ const Anecdote = ({ anecdote, handleVote }) => {
 const AnecdoteList = () => {
   const dispatch = useDispatch()
   const anecdotes = useSelector(state => {
-    if(state.filter === '') {
+    if (state.filter === '') {
       return state.anecdotes
     }
     return state.anecdotes.filter(a => a.content.includes(state.filter))
@@ -27,6 +28,11 @@ const AnecdoteList = () => {
 
   const handleVote = (id) => {
     dispatch(addVote(id))
+
+    dispatch(setNotification(`You voted '${anecdotes.find(a => a.id === id).content}'`))
+    setTimeout(() => {
+      dispatch(removeNotification())
+    }, 5000)
   }
 
   return (

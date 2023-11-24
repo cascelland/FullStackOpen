@@ -33,7 +33,6 @@ export const setNotification = (content, timeout) => {
     const timeoutMillis = timeout*1000
     dispatch(addNotification(content))
     setTimeout(() => {
-      console.log('gogogo')
       dispatch(removeNotification())
     }, timeoutMillis)
   }

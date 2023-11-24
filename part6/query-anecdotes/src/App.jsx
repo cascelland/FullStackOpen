@@ -4,7 +4,6 @@ import Notification from './components/Notification'
 import { getAnecdotes } from './requests'
 
 const App = () => {
-
   const handleVote = (anecdote) => {
     console.log('vote')
   }

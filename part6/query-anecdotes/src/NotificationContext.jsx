@@ -4,11 +4,13 @@ import { createContext, useReducer } from 'react'
 const notificationReducer = (state, action) => {
   switch (action.type) {
     case "CREATED":
-        return `created ${action.payload}`
+      return `created ${action.payload}`
     case "VOTED":
       return `voted ${action.payload}`
+    case "ERROR":
+      return action.payload
     default:
-        return ''
+      return ''
   }
 }
 
@@ -18,7 +20,7 @@ export const NotificationContextProvider = (props) => {
   const [notification, notificationDispatch] = useReducer(notificationReducer, "")
 
   return (
-    <NotificationContext.Provider value={[notification, notificationDispatch] }>
+    <NotificationContext.Provider value={[notification, notificationDispatch]}>
       {props.children}
     </NotificationContext.Provider>
   )

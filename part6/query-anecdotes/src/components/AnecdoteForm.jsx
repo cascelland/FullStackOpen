@@ -5,6 +5,7 @@ import { useContext } from "react"
 
 const AnecdoteForm = () => {
   const [notification, dispatch] = useContext(NotificationContext)
+
   const queryClient = useQueryClient()
 
   const generateId = () =>
@@ -12,7 +13,10 @@ const AnecdoteForm = () => {
 
   const createMutation = useMutation({
     mutationFn: createAnecdote,
-    onSuccess: queryClient.invalidateQueries('anecdotes')
+    onSuccess: queryClient.invalidateQueries('anecdotes'),
+    onError: (error) => {
+      dispatch({ type: "ERROR", payload: error.response.data.error || error.message })
+    }
   })
 
   const onCreate = (event) => {

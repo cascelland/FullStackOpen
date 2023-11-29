@@ -2,7 +2,7 @@
 import { useState } from 'react'
 
 import {
-  Routes, Route, Link, useMatch
+  Routes, Route, Link, useMatch, useNavigate
 } from 'react-router-dom'
 
 const Menu = () => {
@@ -66,7 +66,6 @@ const CreateNew = (props) => {
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
 
-
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
@@ -120,9 +119,17 @@ const App = () => {
 
   const [notification, setNotification] = useState('')
 
+  const navigate = useNavigate()
+
+
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
+    navigate('/')
+    setNotification(`added ${anecdote.content}`)
+    setTimeout(() => {
+      setNotification('')
+    }, 5000)
   }
 
   const anecdoteById = (id) =>
@@ -140,13 +147,13 @@ const App = () => {
   }
 
   const match = useMatch('/anecdotes/:id')
-  console.log('match', match)
   const anecdote = match ? anecdoteById(Number(match.params.id)) : null
 
   return (
     <div>
       <h1>Software anecdotes</h1>
       <Menu />
+      <div>{notification}</div>
 
       <Routes>
         <Route path="/anecdotes/:id" element={<Anecdote anecdote={anecdote} />} />
